@@ -3,9 +3,9 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
+    private static final double CONFIDENCE_CONST = 1.96;
     private final double[] trialValues;
     private final int trials;
-    public static final Double confidenceConst = 1.96;
 
     public PercolationStats(int n, int trials) {
         this.trials = trials;
@@ -47,11 +47,11 @@ public class PercolationStats {
     }
 
     public double confidenceLo() {
-        return mean() - confidenceConst * (stddev() / Math.sqrt(trials));
+        return mean() - CONFIDENCE_CONST * (stddev() / Math.sqrt(trials));
     }
 
     public double confidenceHi() {
-        return mean() + confidenceConst * (stddev() / Math.sqrt(trials));
+        return mean() + CONFIDENCE_CONST * (stddev() / Math.sqrt(trials));
     }
 
     public static void main(String[] args) {
