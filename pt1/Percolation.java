@@ -12,7 +12,6 @@ public class Percolation {
     private int numberOfOpenSites = 0;
 
     public Percolation(int n) {
-
         if (n <= 0)
         {
             throw new IllegalArgumentException();
@@ -32,10 +31,11 @@ public class Percolation {
     }
 
     public boolean isFull(int row, int col) {
-        return uf.connected(getUFIndex(row,col), 0);
+        return uf.connected(getUFIndex(row, col), 0);
     }
 
     public boolean isOpen(int row, int col) {
+        checkBounds(row, col);
         return matrix[row - 1][col - 1] == 0;
     }
 
@@ -44,6 +44,7 @@ public class Percolation {
     }
 
     public void open(int row, int col) {
+        checkBounds(row, col);
         if (isOpen(row, col))
             return;
 
@@ -78,6 +79,13 @@ public class Percolation {
     public int numberOfOpenSites()
     {
         return numberOfOpenSites;
+    }
+
+    private void checkBounds(int row, int column) {
+        if (row > n || row < 0)
+            throw new IllegalArgumentException();
+        if (column > n || column < 0)
+            throw new IllegalArgumentException();
     }
 
     private int getUFIndex(int row, int col)
