@@ -114,7 +114,6 @@ public class Deque<Item> implements Iterable<Item> {
             return;
         }
         else if (left > arr.length / 4 * 3) {
-            // else if (leftFree > leftArrSize / 4) {
             int half = arr.length / 2;
             this.left = this.left - half;
             right = right - half;
@@ -127,7 +126,6 @@ public class Deque<Item> implements Iterable<Item> {
             return;
         }
         if (right >= arr.length) {
-            // if (rightArrSize < 1) {
             Item[] newArray = (Item[]) new Object[arr.length * 2];
             for (int i = 0; i < arr.length; i++) {
                 newArray[i] = arr[i];
@@ -136,7 +134,6 @@ public class Deque<Item> implements Iterable<Item> {
             arr = newArray;
         }
         else if (right <= arr.length / 4) {
-            // else if (rightFree > rightArrSize / 4) {
             Item[] newArray = (Item[]) new Object[arr.length / 2];
             for (int i = 0; i < newArray.length; i++) {
                 newArray[i] = arr[i];
