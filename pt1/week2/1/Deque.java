@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
  *  Date:
  *  Description:
  **************************************************************************** */
-@SuppressWarnings("unchecked")
 public class Deque<Item> implements Iterable<Item> {
     private Item[] arr;
     private int left;
@@ -18,11 +17,10 @@ public class Deque<Item> implements Iterable<Item> {
         right = arr.length / 2;
         left = arr.length / 2;
         size = 0;
-        printArray();
     }
 
     public boolean isEmpty() {
-        return true;
+        return size() == 0;
     }
 
     public int size() {
@@ -44,7 +42,6 @@ public class Deque<Item> implements Iterable<Item> {
             --left;
 
         ++size;
-        printArray();
     }
 
     public void addLast(Item item) {
@@ -62,7 +59,6 @@ public class Deque<Item> implements Iterable<Item> {
             ++right;
 
         ++size;
-        printArray();
     }
 
     public Item removeFirst() {
@@ -76,7 +72,6 @@ public class Deque<Item> implements Iterable<Item> {
         Item itm = arr[left];
         arr[left] = null;
         resizeIfNeeded();
-        printArray();
 
         return itm;
     }
@@ -92,7 +87,6 @@ public class Deque<Item> implements Iterable<Item> {
         Item itm = arr[right];
         arr[right] = null;
         resizeIfNeeded();
-        printArray();
 
         return itm;
     }
@@ -149,7 +143,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     private class DequeIterator implements Iterator<Item> {
         private int lft = left;
-        private int rht = right;
+        private final int rht = right;
 
         @Override
         public boolean hasNext() {
@@ -159,40 +153,48 @@ public class Deque<Item> implements Iterable<Item> {
 
         @Override
         public Item next() {
-            return arr[--rht];
+            if (!this.hasNext())
+            {
+                throw new NoSuchElementException();
+            }
+            return arr[++lft];
         }
     }
 
-    private void printArray() {
-        String r = "[";
-        for (int i = 0; i < arr.length - 1; i++) {
-            Item val = arr[i];
-            String strVal = val == null ? "NULL" : val.toString();
-
-            if(i == left || i == right)
-                r += ("[" + strVal + "]" + ",\t");
-            else
-                r += (strVal + ",\t");
-        }
-        Item val = arr[arr.length - 1];
-        String strVal = val == null ? "NULL" : val.toString();
-
-        if(arr.length - 1 == left || arr.length - 1 == right)
-            r += ("[" + strVal + "]");
-        else
-            r += (strVal);
-
-        r += "]";
-        System.out.println(r + "; Size = " + this.size() + "; Size of array = " + arr.length + "; left = " + left + "; right = " + right);
-    }
+    // private void printArray() {
+    //     String r = "[";
+    //     for (int i = 0; i < arr.length - 1; i++) {
+    //         Item val = arr[i];
+    //         String strVal = val == null ? "NULL" : val.toString();
+    //
+    //         if(i == left || i == right)
+    //             r += ("[" + strVal + "]" + ",\t");
+    //         else
+    //             r += (strVal + ",\t");
+    //     }
+    //     Item val = arr[arr.length - 1];
+    //     String strVal = val == null ? "NULL" : val.toString();
+    //
+    //     if(arr.length - 1 == left || arr.length - 1 == right)
+    //         r += ("[" + strVal + "]");
+    //     else
+    //         r += (strVal);
+    //
+    //     r += "]";
+    //     System.out.println(r + "; Size = " + this.size() + "; Size of array = " + arr.length + "; left = " + left + "; right = " + right);
+    // }
 
     public static void main(String[] args)   {
 
-        // Deque<Integer> d = new Deque<Integer>();
-        //
-        // d.addFirst(1);
-        // d.addFirst(1);
-        // d.addFirst(1);
+        Deque<Integer> d = new Deque<Integer>();
+
+        d.addFirst(1);
+        d.addFirst(2);
+        d.addFirst(3);
+
+        for(int i : d) {
+            System.out.println(i);
+        }
         // d.addFirst(1);
         // d.addFirst(1);
         // d.addFirst(1);
