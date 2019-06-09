@@ -8,8 +8,9 @@
  *
  ******************************************************************************/
 
-import java.util.Comparator;
 import edu.princeton.cs.algs4.StdDraw;
+
+import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
 
@@ -59,7 +60,20 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        /* YOUR CODE HERE */
+
+        if (this.y == that.y)
+        {
+            if (this.x == that.x)
+            {
+                return Double.NEGATIVE_INFINITY;
+            }
+            return +0.0;
+        }
+        else if (this.x == that.x) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        return ((double) (that.y - this.y))/(that.x - this.x);
     }
 
     /**
@@ -75,7 +89,11 @@ public class Point implements Comparable<Point> {
      *         argument point
      */
     public int compareTo(Point that) {
-        /* YOUR CODE HERE */
+        if (this.y == that.y)
+        {
+            return this.x - that.x;
+        }
+        return this.y - that.y;
     }
 
     /**
@@ -85,7 +103,19 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        /* YOUR CODE HERE */
+        return new PointComparator();
+    }
+
+
+    private class PointComparator implements Comparator<Point> {
+
+        @Override
+        public int compare(Point o1, Point o2) {
+            double slopeWithO1 = slopeTo(o1);
+            double slopeWithO2 = slopeTo(o2);
+
+            return Double.compare(slopeWithO1, slopeWithO2);
+        }
     }
 
 
@@ -105,6 +135,15 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        /* YOUR CODE HERE */
+        Point p = new Point(42, 42);
+        assert p.slopeTo(p) == Double.NEGATIVE_INFINITY
+                : "itself = -inf";
+
+        assert new Point(2, 921321)
+                .slopeTo(new Point(2, 123)) == Double.POSITIVE_INFINITY : "vertical line = +inf";
+
+        assert new Point(42, 3)
+                .slopeTo(new Point(24, 3)) == +0.0
+                : "horizontal line = +0.0";
     }
 }
