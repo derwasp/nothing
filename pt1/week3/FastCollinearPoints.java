@@ -31,17 +31,18 @@ public class FastCollinearPoints {
 
         lineSegments = new ArrayList<>();
 
-        Arrays.sort(pointsCopy);
         for (int i = 0; i < points.length; i++) {
             Point p = points[i];
+            Arrays.sort(pointsCopy);
             Arrays.sort(pointsCopy, p.slopeOrder());
             Point previous = null;
             int left =   -1;
             int right =  -1;
             for (int j = 1; j < pointsCopy.length; j++) {
                 Point cPoint = pointsCopy[j];
+                double currentSlope = p.slopeTo(cPoint);
                 boolean sameSlope = previous != null
-                        && p.slopeTo(cPoint) == p.slopeTo(previous);
+                        && currentSlope == p.slopeTo(previous);
 
                 boolean endOfTheLoop = j == (pointsCopy.length - 1);
 
@@ -51,7 +52,10 @@ public class FastCollinearPoints {
 
                 if (!sameSlope || endOfTheLoop) {
                     int pointsAmout = right - left + 1;
-                    if (pointsAmout >= 3) {
+
+                    if (pointsAmout >= 3
+                        && pointsCopy[left].compareTo(p) > 0) {
+
                         Point[] arr = new Point[pointsAmout];
                         int arrI = 0;
                         for (int i2 = left; i2 <= right; i2++, arrI++) {
@@ -59,9 +63,7 @@ public class FastCollinearPoints {
                         }
                         Arrays.sort(arr);
 
-                        if (arr[0].compareTo(p) > 0) {
-                            lineSegments.add(new LineSegment(p, arr[arr.length - 1]));
-                        }
+                        lineSegments.add(new LineSegment(p, arr[arr.length - 1]));
                     }
 
                     left = j;
