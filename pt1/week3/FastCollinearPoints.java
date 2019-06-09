@@ -8,11 +8,11 @@ public class FastCollinearPoints {
     }
 
     public int numberOfSegments() {
-
+        return 0;
     }
 
     public LineSegment[] segments() {
-
+        return null;
     }
 
     public static void main(String[] args) {
