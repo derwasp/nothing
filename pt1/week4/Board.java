@@ -10,7 +10,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class Board implements Iterable<Board> {
+public class Board {
     private final int[][] blocks;
     private final int n;
     private final int hammingPriority;
@@ -98,10 +98,11 @@ public class Board implements Iterable<Board> {
             for (int j = 0; j < n; j++) {
                 if (blocks[i][j] != 0) {
                     if (fst == null)
-                        fst = new Coordinates(i,j);
+                        fst = new Coordinates(i, j);
                     else {
-                        Coordinates snd = new Coordinates(i,j);
+                        Coordinates snd = new Coordinates(i, j);
                         clonedBoard.swapBlocks(fst, snd);
+                        return clonedBoard;
                     }
                 }
             }
@@ -126,7 +127,8 @@ public class Board implements Iterable<Board> {
     }
 
     public Iterable<Board> neighbors() {
-        return this;
+
+        return NeighborsIterator::new;
     }
 
     public String toString() {
@@ -157,11 +159,11 @@ public class Board implements Iterable<Board> {
             StdOut.println(initial.manhattan());
             StdOut.println(initial.hamming());
 
-            for (Board b : initial) {
-                StdOut.println(b);
-                StdOut.println(b.manhattan());
-                StdOut.println(b.hamming());
-            }
+            // for (Board b : initial.iterator()) {
+            //     StdOut.println(b);
+            //     StdOut.println(b.manhattan());
+            //     StdOut.println(b.hamming());
+            // }
         }
     }
 
@@ -187,10 +189,10 @@ public class Board implements Iterable<Board> {
         private Board[] boards = new Board[4];
 
         public NeighborsIterator() {
-            boolean canGoLeft = zero.i > 0;
+            boolean canGoLeft = zero.j > 0;
             boolean canGoRight = zero.j < n - 1;
-            boolean canGoUp = zero.j > 0;
-            boolean canGoDown = zero.j < n - 1;
+            boolean canGoUp = zero.i > 0;
+            boolean canGoDown = zero.i < n - 1;
             if (canGoLeft) {
                 int[][] clone = deepCopyIntMatrix(blocks);
                 Coordinates to = new Coordinates(zero.i, zero.j - 1);
@@ -235,10 +237,5 @@ public class Board implements Iterable<Board> {
                 throw new NoSuchElementException();
             return boards[postition--];
         }
-    }
-
-    @Override
-    public Iterator<Board> iterator() {
-        return new NeighborsIterator();
     }
 }
