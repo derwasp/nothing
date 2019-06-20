@@ -22,9 +22,7 @@ public class Solver {
         minPq = new edu.princeton.cs.algs4.MinPQ<BoardWithPrevious>(1, new BoardComparator());
         minPqTwin = new edu.princeton.cs.algs4.MinPQ<BoardWithPrevious>(1, new BoardComparator());
 
-        StdOut.println(initial);
         Board twin = initial.twin();
-        StdOut.println(twin);
 
         BoardWithPrevious initBoard = new BoardWithPrevious(initial, null, 0);
         minPq.insert(initBoard);
@@ -36,7 +34,19 @@ public class Solver {
     }
 
     private BoardWithPrevious solve() {
-        while (!minPq.isEmpty() && !minPqTwin.isEmpty()) {
+        while (true) {
+            BoardWithPrevious bTwin = minPqTwin.delMin();
+            if (bTwin.board.isGoal())
+                return null;
+            for (Board neighbor : bTwin.board.neighbors()) {
+                if (bTwin.previous != null && neighbor.equals(bTwin.previous.board))
+                    continue;
+
+                BoardWithPrevious boardPrevPair = new BoardWithPrevious(neighbor, bTwin, bTwin.path + 1);
+                minPqTwin.insert(boardPrevPair);
+            }
+
+
             BoardWithPrevious b = minPq.delMin();
             if (b.board.isGoal())
                 return b;
@@ -46,20 +56,7 @@ public class Solver {
                     minPq.insert(boardPrevPair);
                 }
             }
-
-
-            BoardWithPrevious bTwin = minPqTwin.delMin();
-            if (bTwin.board.isGoal())
-                return null;
-            for (Board neighbor : bTwin.board.neighbors()) {
-                if (bTwin.previous == null || !neighbor.equals(bTwin.previous.board)) {
-                    BoardWithPrevious boardPrevPair = new BoardWithPrevious(neighbor, bTwin, bTwin.path + 1);
-                    minPqTwin.insert(boardPrevPair);
-                }
-            }
         }
-
-        return null;
     }
 
     public boolean isSolvable() {
@@ -68,13 +65,14 @@ public class Solver {
 
     public int moves() {
         if (solutionBoardPrevPair == null)
-            return 0;
+            return -1;
         return solutionBoardPrevPair.path;
     }
 
 
     public Iterable<Board> solution() {
-
+        if (solutionBoardPrevPair == null)
+            return null;
         return ReverseBoardsIterator::new;
     }
 
@@ -146,7 +144,7 @@ public class Solver {
 
         @Override
         public int compare(BoardWithPrevious o1, BoardWithPrevious o2) {
-            return o1.board.manhattan() - o2.board.manhattan();
+            return o1.board.manhattan() - o2.board.manhattan() + o1.path - o2.path;
         }
     }
 }

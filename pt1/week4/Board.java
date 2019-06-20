@@ -16,7 +16,7 @@ public class Board {
     private final int hammingPriority;
     private final int manhattanPriority;
     private final boolean isGoal;
-    private final Coordinates zero;
+    private Coordinates zero;
 
     private class Coordinates {
         public final int i;
@@ -27,17 +27,17 @@ public class Board {
         }
     }
 
-    public Board(int[][] blocks) {
-        if (blocks == null)
+    public Board(int[][] initBlocks) {
+        if (initBlocks == null)
             throw new java.lang.IllegalArgumentException();
-        if (blocks.length == 0)
+        if (initBlocks.length == 0)
             throw new java.lang.IllegalArgumentException();
-        this.blocks = deepCopyIntMatrix(blocks);
+        this.blocks = deepCopyIntMatrix(initBlocks);
         this.n = this.blocks.length;
 
         int hammingPrio = 0;
         int manhattanPrio = 0;
-        Coordinates zeroPosition = null;
+        // Coordinates zeroPosition = null;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 int currentValidNumber = i * n + j + 1;
@@ -49,7 +49,7 @@ public class Board {
 
                 if (actualNumber == 0)
                 {
-                    zeroPosition = new Coordinates(i, j);
+                    setZero(new Coordinates(i, j));
                     continue;
                 }
 
@@ -64,14 +64,14 @@ public class Board {
             }
         }
 
-        if (zeroPosition == null) {
-            throw new java.lang.IllegalArgumentException("Zero was not found in the array");
-        }
+        // if (zeroPosition == null) {
+        //     throw new java.lang.IllegalArgumentException("Zero was not found in the array");
+        // }
 
         this.manhattanPriority = manhattanPrio;
         this.hammingPriority = hammingPrio;
         this.isGoal = manhattanPrio == 0 && hammingPrio == 0;
-        this.zero = zeroPosition;
+        // this.zero = zeroPosition;
     }
 
     public int dimension() {
@@ -110,6 +110,10 @@ public class Board {
         return clonedBoard;
     }
 
+    private void setZero(Coordinates z) {
+        zero = z;
+    }
+
     private void swapBlocks(Coordinates block1, Coordinates block2) {
         int tmpValue = blocks[block1.i][block1.j];
         blocks[block1.i][block1.j] = blocks[block2.i][block2.j];
@@ -123,7 +127,15 @@ public class Board {
 
         Board b = (Board) y;
 
-        return java.util.Arrays.equals(b.blocks, this.blocks);
+        if (b.blocks.length != this.blocks.length)
+            return false;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (b.blocks[i][j] != this.blocks[i][j])
+                    return false;
+            }
+        }
+        return true;
     }
 
     public Iterable<Board> neighbors() {
@@ -132,15 +144,15 @@ public class Board {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder s = new StringBuilder();
+        s.append(n + "\n");
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                sb.append(blocks[i][j]);
-                sb.append(" ");
+                s.append(String.format("%2d ", blocks[i][j]));
             }
-            sb.append("\n");
+            s.append("\n");
         }
-        return sb.toString();
+        return s.toString();
     }
 
     public static void main(String[] args) {
@@ -174,68 +186,67 @@ public class Board {
         return new Coordinates(actualNumberI, actualNumberJ);
     }
 
-    public static int[][] deepCopyIntMatrix(int[][] input) {
+    private static int[][] deepCopyIntMatrix(int[][] input) {
         if (input == null)
             return null;
-        int[][] result = new int[input.length][];
-        for (int r = 0; r < input.length; r++) {
-            result[r] = input[r].clone();
+        int[][] result = new int[input.length][input.length];
+        for (int i = 0; i < input.length; i++) {
+            for (int j = 0; j < input[i].length; j++)
+                result[i][j] = input[i][j];
         }
         return result;
     }
 
     private class NeighborsIterator implements Iterator<Board> {
-        private int postition = -1;
+        private int position = -1;
         private Board[] boards = new Board[4];
 
         public NeighborsIterator() {
-            boolean canGoLeft = zero.j > 0;
-            boolean canGoRight = zero.j < n - 1;
-            boolean canGoUp = zero.i > 0;
-            boolean canGoDown = zero.i < n - 1;
-            if (canGoLeft) {
-                int[][] clone = deepCopyIntMatrix(blocks);
+            boolean canDecreaseJ = zero.j > 0;
+            boolean canIncreaseJ = zero.j < n - 1;
+            boolean canDecreaseI = zero.i > 0;
+            boolean canIncreaseI = zero.i < n - 1;
+            if (canDecreaseJ) {
                 Coordinates to = new Coordinates(zero.i, zero.j - 1);
-                swap(clone, zero, to);
-                boards[++postition] = new Board(clone);
+                Board newBoard = new Board(blocks);
+                newBoard.swapBlocks(zero, to);
+                newBoard.setZero(to);
+                boards[++position] = newBoard;
             }
-            if (canGoRight) {
-                int[][] clone = deepCopyIntMatrix(blocks);
+            if (canIncreaseJ) {
                 Coordinates to = new Coordinates(zero.i, zero.j + 1);
-                swap(clone, zero, to);
-                boards[++postition] = new Board(clone);
+                Board newBoard = new Board(blocks);
+                newBoard.swapBlocks(zero, to);
+                newBoard.setZero(to);
+                boards[++position] = newBoard;
             }
-            if (canGoUp) {
-                int[][] clone = deepCopyIntMatrix(blocks);
+            if (canDecreaseI) {
                 Coordinates to = new Coordinates(zero.i - 1, zero.j);
-                swap(clone, zero, to);
-                boards[++postition] = new Board(clone);
+                Board newBoard = new Board(blocks);
+                newBoard.swapBlocks(zero, to);
+                newBoard.setZero(to);
+                boards[++position] = newBoard;
             }
-            if (canGoDown) {
-                int[][] clone = deepCopyIntMatrix(blocks);
+            if (canIncreaseI) {
                 Coordinates to = new Coordinates(zero.i + 1, zero.j);
-                swap(clone, zero, to);
-                boards[++postition] = new Board(clone);
+                Board newBoard = new Board(blocks);
+                newBoard.swapBlocks(zero, to);
+                newBoard.setZero(to);
+                boards[++position] = newBoard;
             }
 
-        }
-
-        private void swap(int[][] arr, Coordinates from, Coordinates to) {
-            int tmp = arr[from.i][from.j];
-            arr[from.i][from.j] = arr[to.i][to.j];
-            arr[to.i][to.j] = tmp;
         }
 
         @Override
         public boolean hasNext() {
-            return postition != -1;
+            return position != -1;
         }
 
         @Override
         public Board next() {
             if (!hasNext())
                 throw new NoSuchElementException();
-            return boards[postition--];
+            return boards[position--];
         }
     }
 }
