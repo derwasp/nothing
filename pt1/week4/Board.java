@@ -91,7 +91,28 @@ public class Board implements Iterable<Board> {
     }
 
     public Board twin() {
-        return null;
+        Board clonedBoard = new Board(blocks);
+
+        Coordinates fst = null;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (blocks[i][j] != 0) {
+                    if (fst == null)
+                        fst = new Coordinates(i,j);
+                    else {
+                        Coordinates snd = new Coordinates(i,j);
+                        clonedBoard.swapBlocks(fst, snd);
+                    }
+                }
+            }
+        }
+        return clonedBoard;
+    }
+
+    private void swapBlocks(Coordinates block1, Coordinates block2) {
+        int tmpValue = blocks[block1.i][block1.j];
+        blocks[block1.i][block1.j] = blocks[block2.i][block2.j];
+        blocks[block2.i][block2.j] = tmpValue;
     }
 
     public boolean equals(Object y) {
