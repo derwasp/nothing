@@ -87,7 +87,52 @@ public class KdTree {
     }
 
     public boolean contains(Point2D p) {
-        return false;
+        if (root == null)
+            return false;
+
+        TreeNode pointer = root;
+
+        while (true) {
+            if (pointer.point.equals(p))
+                return true;
+
+            if (pointer.vertical) {
+                if (pointer.point.x() < p.x()) {
+                    if (pointer.right == null) {
+                        return false;
+                    }
+                    else {
+                        pointer = pointer.right;
+                    }
+                }
+                else {
+                    if (pointer.left == null) {
+                        return false;
+                    }
+                    else {
+                        pointer = pointer.left;
+                    }
+                }
+            }
+            else {
+                if (pointer.point.y() < p.y()) {
+                    if (pointer.right == null) {
+                        return false;
+                    }
+                    else {
+                        pointer = pointer.right;
+                    }
+                }
+                else {
+                    if (pointer.left == null) {
+                        return false;
+                    }
+                    else {
+                        pointer = pointer.left;
+                    }
+                }
+            }
+        }
     }
 
     private void drawInternal(TreeNode node) {
@@ -132,10 +177,18 @@ public class KdTree {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null)
+            throw new java.lang.IllegalArgumentException();
+
         return new ArrayList<>();
     }
 
     public Point2D nearest(Point2D p) {
+        if (p == null)
+            throw new java.lang.IllegalArgumentException();
+
+        if (isEmpty())
+            return null;
         return p;
     }
 
