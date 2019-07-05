@@ -8,7 +8,6 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.ArrayList;
 
@@ -176,11 +175,80 @@ public class KdTree {
         drawInternal(this.root);
     }
 
+    private boolean higherThanPoint(RectHV rect, TreeNode node) {
+        if (node.vertical) {
+            return rect.xmin() > node.point.x();
+        }
+        return rect.ymin() > node.point.y();
+    }
+
+    private boolean lowerThanPoint(RectHV rect, TreeNode node) {
+        if (node.vertical) {
+            return rect.xmax() < node.point.x();
+        }
+        return rect.ymax() < node.point.y();
+    }
+
+    private void rangeInternal(TreeNode node, ArrayList<Point2D> points, RectHV rect) {
+        if (rect == null)
+            return;
+
+        if (rect.contains(node.point))
+           points.add(node.point);
+
+        if (higherThanPoint(rect, node)) {
+            rangeInternal(node.right, points, rect);
+        }
+        else if (lowerThanPoint(rect, node))  {
+            rangeInternal(node.left, points, rect);
+        }
+        else { // intersects
+            rangeInternal(node.left, points, rect);
+            rangeInternal(node.right, points, rect);
+        }
+    }
+
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null)
             throw new java.lang.IllegalArgumentException();
 
-        return new ArrayList<>();
+        ArrayList<Point2D> points = new ArrayList<>();
+        rangeInternal(root, points, rect);
+        return points;
+    }
+
+    private Point2D nearestInternal(Point2D target, TreeNode node, Point2D closest) {
+        if (node == null)
+            return closest;
+
+        if (closest == null)
+            closest = node.point;
+
+        double thisNodeDistanceToTarget = node.point.distanceTo(target);
+
+        if (thisNodeDistanceToTarget < closest.distanceTo(target)) {
+            closest = node.point;
+        }
+
+
+        if (node.left != null) {
+            Point2D nearestLeft = nearestInternal(target, node.left, closest);
+            if (nearestLeft.distanceTo(target) < closest
+                    .distanceTo(target)) {
+                closest = nearestLeft;
+            }
+        }
+
+        if (node.right != null)
+        {
+            Point2D nearestRight = nearestInternal(target, node.right, closest);
+            if (nearestRight.distanceTo(target) < closest
+                    .distanceTo(target)) {
+                closest = nearestRight;
+            }
+        }
+
+        return closest;
     }
 
     public Point2D nearest(Point2D p) {
@@ -189,7 +257,8 @@ public class KdTree {
 
         if (isEmpty())
             return null;
-        return p;
+
+        return nearestInternal(p, root, null);
     }
 
     private static class TreeNode  {
@@ -211,13 +280,19 @@ public class KdTree {
 
     public static void main(String[] args) {
         KdTree testTree = new KdTree();
+        testTree.insert(new Point2D(0,0));
+        testTree.insert(new Point2D(0,0.1));
+        testTree.insert(new Point2D(0,0.2));
 
-        for (int i = 0; i < 10; i++) {
-            double x = StdRandom.uniform(0.0, 1.0);
-            double y = StdRandom.uniform(0.0, 1.0);
-            testTree.insert(new Point2D(x,y));
-            // StdOut.printf("%8.6f %8.6f\n", x, y);
-        }
+        Point2D p = testTree.nearest(new Point2D(0, 0.3));
+
+
+        // for (int i = 0; i < 10; i++) {
+        //     double x = StdRandom.uniform(0.0, 1.0);
+        //     double y = StdRandom.uniform(0.0, 1.0);
+        //     testTree.insert(new Point2D(x,y));
+        //     // StdOut.printf("%8.6f %8.6f\n", x, y);
+        // }
 
         StdOut.println(testTree.size());
     }
