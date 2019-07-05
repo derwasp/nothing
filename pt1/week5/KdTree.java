@@ -12,7 +12,7 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.ArrayList;
 
 public class KdTree {
-    TreeNode root;
+    private TreeNode root;
 
     public KdTree() {
 
@@ -23,8 +23,62 @@ public class KdTree {
     }
 
     public int size() {
+        if(isEmpty())
+            return 0;
         return root.size;
     }
+
+    // public TreeNode find(Point2D p, TreeNode pointer) {
+    //     if (root == null)
+    //     {
+    //         return null;
+    //     }
+    //
+    //     boolean vertical = true;
+    //
+    //     if (pointer.vertical) {
+    //         if (pointer.point.x() < p.x()) {
+    //             if (pointer.right == null) {
+    //                 return pointer;
+    //             }
+    //             else {
+    //                 return find(p, pointer.right);
+    //             }
+    //         }
+    //         else {
+    //             if (pointer.left == null) {
+    //                 return pointer;
+    //                 RectHV newRect = new RectHV(pointer.box.xmin(),pointer.box.ymin(), pointer.point.x(), pointer.box.ymax());
+    //                 pointer.left = new TreeNode(p, !pointer.vertical, 1, newRect);
+    //             }
+    //             else {
+    //                 pointer = pointer.left;
+    //             }
+    //         }
+    //     }
+    //     else {
+    //         if (pointer.point.y() < p.y()) {
+    //             if (pointer.right == null) {
+    //                 RectHV newRect = new RectHV(pointer.box.xmin(), pointer.point.y(),
+    //                                             pointer.box.xmax(), pointer.box.ymax());
+    //                 pointer.right = new TreeNode(p, !pointer.vertical, 1, newRect);
+    //             }
+    //             else {
+    //                 pointer = pointer.right;
+    //             }
+    //         }
+    //         else {
+    //             if (pointer.left == null) {
+    //                 RectHV newRect = new RectHV(pointer.box.xmin(), pointer.box.ymin(),
+    //                                             pointer.box.xmax(), pointer.point.y());
+    //                 pointer.left = new TreeNode(p, !pointer.vertical, 1, newRect);
+    //             }
+    //             else {
+    //                 pointer = pointer.left;
+    //             }
+    //         }
+    //     }
+    // }
 
     public void insert(Point2D p) {
         if (root == null)
@@ -37,7 +91,12 @@ public class KdTree {
         TreeNode pointer = root;
 
         while (true) {
+            if (pointer.point.equals(p))
+            {
+                return;
+            }
             pointer.size++;
+
             if (pointer.vertical) {
                 if (pointer.point.x() < p.x()) {
                     if (pointer.right == null) {
@@ -85,6 +144,69 @@ public class KdTree {
         }
     }
 
+    public TreeNode insertInternal(Point2D p) {
+        if (root == null) {
+            root = new TreeNode(p, true, 1, new RectHV(0, 0, 1, 1));
+            return root;
+        }
+
+        boolean vertical = true;
+        TreeNode pointer = root;
+
+        if (pointer.point.equals(p)) {
+            return pointer;
+        }
+
+        if (pointer.vertical) {
+            if (pointer.point.x() < p.x()) {
+                if (pointer.right == null) {
+                    RectHV newRect = new RectHV(pointer.point.x(), pointer.box.ymin(),
+                                                pointer.box.xmax(), pointer.box.ymax());
+                    pointer.right = new TreeNode(p, !pointer.vertical, 1, newRect);
+                    break;
+                }
+                else {
+                    pointer = pointer.right;
+                }
+            }
+            else {
+                if (pointer.left == null) {
+                    RectHV newRect = new RectHV(pointer.box.xmin(), pointer.box.ymin(),
+                                                pointer.point.x(), pointer.box.ymax());
+                    pointer.left = new TreeNode(p, !pointer.vertical, 1, newRect);
+                    break;
+                }
+                else {
+                    pointer = pointer.left;
+                }
+            }
+        }
+        else {
+            if (pointer.point.y() < p.y()) {
+                if (pointer.right == null) {
+                    RectHV newRect = new RectHV(pointer.box.xmin(), pointer.point.y(),
+                                                pointer.box.xmax(), pointer.box.ymax());
+                    pointer.right = new TreeNode(p, !pointer.vertical, 1, newRect);
+                    break;
+                }
+                else {
+                    pointer = pointer.right;
+                }
+            }
+            else {
+                if (pointer.left == null) {
+                    RectHV newRect = new RectHV(pointer.box.xmin(), pointer.box.ymin(),
+                                                pointer.box.xmax(), pointer.point.y());
+                    pointer.left = new TreeNode(p, !pointer.vertical, 1, newRect);
+                    break;
+                }
+                else {
+                    pointer = pointer.left;
+                }
+            }
+        }
+    }
+
     public boolean contains(Point2D p) {
         if (root == null)
             return false;
@@ -96,7 +218,7 @@ public class KdTree {
                 return true;
 
             if (pointer.vertical) {
-                if (pointer.point.x() < p.x()) {
+                if (pointer.point.x() <= p.x()) {
                     if (pointer.right == null) {
                         return false;
                     }
@@ -114,7 +236,7 @@ public class KdTree {
                 }
             }
             else {
-                if (pointer.point.y() < p.y()) {
+                if (pointer.point.y() <= p.y()) {
                     if (pointer.right == null) {
                         return false;
                     }
@@ -190,7 +312,7 @@ public class KdTree {
     }
 
     private void rangeInternal(TreeNode node, ArrayList<Point2D> points, RectHV rect) {
-        if (rect == null)
+        if (node == null)
             return;
 
         if (rect.contains(node.point))
@@ -217,6 +339,10 @@ public class KdTree {
         return points;
     }
 
+    // private boolean shouldDive(Point2D p, RectHV rect, double dstBest) {
+    //
+    // }
+
     private Point2D nearestInternal(Point2D target, TreeNode node, Point2D closest) {
         if (node == null)
             return closest;
@@ -232,6 +358,7 @@ public class KdTree {
 
 
         if (node.left != null) {
+
             Point2D nearestLeft = nearestInternal(target, node.left, closest);
             if (nearestLeft.distanceTo(target) < closest
                     .distanceTo(target)) {
@@ -281,10 +408,14 @@ public class KdTree {
     public static void main(String[] args) {
         KdTree testTree = new KdTree();
         testTree.insert(new Point2D(0,0));
-        testTree.insert(new Point2D(0,0.1));
-        testTree.insert(new Point2D(0,0.2));
+        testTree.insert(new Point2D(0,0.5));
+        testTree.insert(new Point2D(0.5,0.25));
+        testTree.insert(new Point2D(0.5,0));
+        testTree.insert(new Point2D(0,1));
+        testTree.insert(new Point2D(1,0.75));
+        testTree.insert(new Point2D(0.5,0));
 
-        Point2D p = testTree.nearest(new Point2D(0, 0.3));
+        // Point2D p = testTree.nearest(new Point2D(0, 0.3));
 
 
         // for (int i = 0; i < 10; i++) {
