@@ -10,7 +10,12 @@ import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
 public class SAP {
-    public SAP(Digraph G) {}
+    private Digraph graph;
+    public SAP(Digraph G) {
+        if (G == null)
+            throw new IllegalArgumentException();
+        graph = G;
+    }
 
     // length of shortest ancestral path between v and w; -1 if no such path
     public int length(int v, int w) {}

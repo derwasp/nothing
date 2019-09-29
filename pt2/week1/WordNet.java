@@ -29,7 +29,7 @@ public class WordNet {
 
         if (new DirectedCycle(graph).hasCycle())
             throw new IllegalArgumentException();
-        sap = new SAP(graph);
+        sap = new SAP(new Digraph(graph));
     }
 
     private void initSynsets(String synsets) {
