@@ -29,7 +29,7 @@ public class WordNet {
 
         if (new DirectedCycle(graph).hasCycle())
             throw new IllegalArgumentException();
-        sap = new SAP(new Digraph(graph));
+        sap = new SAP(graph);
     }
 
     private void initSynsets(String synsets) {
@@ -38,7 +38,7 @@ public class WordNet {
 
         In in = new In(synsets);
         while(!in.isEmpty()) {
-            String[] line = in.readString().split(",");
+            String[] line = in.readLine().split(",");
             int id = Integer.parseInt(line[0]);
             String synset = line[1];
             synsetTextValues.put(id, synset);
